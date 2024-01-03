@@ -1,13 +1,7 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.example.myshoppinglistapp
-
-
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Arrangement.SpaceBetween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +17,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -36,7 +29,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 data class ShoppingItem(val id:Int, var name: String, var quantity:Int, var isEditing: Boolean = false)
 
@@ -51,16 +48,39 @@ fun ShoppingListApp(){
         modifier = Modifier.fillMaxSize(),
         verticalArrangement =  Arrangement.Center
     ){
-        androidx.compose.foundation.layout.Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-            Text(text = "My First Android App", modifier = Modifier.padding(8.dp), Color.Gray)
+        androidx.compose.foundation.layout.Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center) {
+                   Text(
+                       text = "My Shopping List",
+                       modifier = Modifier.padding(16.dp),
+                       color = Color.Magenta,
+                       fontFamily = FontFamily.Cursive,
+                       fontWeight = FontWeight.ExtraBold,
+                       fontSize = 40.sp
+                   )
+        }
+        androidx.compose.foundation.layout.Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center) {
+            Text(
+                text = "My First Android App",
+                color = Color.Gray,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.ExtraLight,
+                fontSize = 14.sp
+            )
         }
 
         Button(
             onClick = {showDialog = true},
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(40.dp)
         ){
             Text("Add Item")
         }
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -81,7 +101,6 @@ fun ShoppingListApp(){
                 } else {
                     ShoppingListItem(item = item,
                         onEditClick = {
-                        //Find item selected in the list and change it to isEditing = true
                         sItems = sItems.map{it.copy(isEditing = it.id == item.id )}
                     },
                         onDeleteClick = {
@@ -150,43 +169,71 @@ fun ShoppingItemEditor(item: ShoppingItem, onEditComplete: (String, Int) -> Unit
     var editedQuantity by remember { mutableStateOf(item.quantity.toString()) }
     var isEditing by remember { mutableStateOf(item.isEditing) }
 
-    androidx.compose.foundation.layout.Row(modifier = Modifier
-        .fillMaxWidth()
-        .background(Color.White)
-        .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceEvenly
-        )
-        {
-            Column {
-                BasicTextField(
-                    value = editedName,
-                    onValueChange = {editedName = it},
-                    singleLine = true,
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .padding(8.dp)
-                )
-                BasicTextField(
-                    value = editedQuantity,
-                    onValueChange = {editedQuantity = it},
-                    singleLine = true,
-                    modifier = Modifier
-                        .wrapContentSize()
-                        .padding(8.dp)
-                )
-            }
-
-            Button(
-                onClick = {
+    AlertDialog(onDismissRequest = { isEditing = false },
+        confirmButton = {
+            androidx.compose.foundation.layout.Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+                horizontalArrangement = Arrangement.Center) {
+                Button(onClick = {
                     isEditing = false
-                    onEditComplete(editedName, editedQuantity.toIntOrNull() ?: 1) // if chars aren't ints default to 1
+                    onEditComplete(
+                        editedName,
+                        editedQuantity.toIntOrNull() ?: 1
+                    ) // if chars aren't ints default to 1
+                }){
+                    Text(text = "Save")
                 }
-            ) {
-                Text(text = "Save")
             }
-    }
+        },
+        title = { Text(text = "Edit Item")},
+        text = {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+            ) {
+                Column {
+                    BasicTextField(
+                        value = "Name",
+                        onValueChange = { },
+                        singleLine = true,
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(8.dp)
+                    )
+                    BasicTextField(
+                        value = "Quantity",
+                        onValueChange = { },
+                        singleLine = true,
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(8.dp)
+                    )
+                }
+                Column {
+                    BasicTextField(
+                        value = editedName,
+                        onValueChange = { editedName = it },
+                        singleLine = true,
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(8.dp),
+                        textStyle = TextStyle(fontSize = 16.sp, color = Color.Magenta)
+                    )
+                    BasicTextField(
+                        value = editedQuantity,
+                        onValueChange = { editedQuantity = it },
+                        singleLine = true,
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(8.dp),
+                        textStyle = TextStyle(fontSize = 16.sp, color = Color.Magenta)
+                    )
+                }
+            }
+        }
+    )
 }
-
 
 @Composable
 fun ShoppingListItem(
